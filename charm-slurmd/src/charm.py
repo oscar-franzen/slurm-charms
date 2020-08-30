@@ -3,6 +3,8 @@
 import logging
 import subprocess
 from pathlib import Path
+from time import sleep
+import random
 
 
 import requests
@@ -79,6 +81,7 @@ class SlurmdCharm(CharmBase):
             event.defer()
             return
 
+        sleep(random.randint(1, 5))
         # cast StoredState -> python dict
         #slurm_config = dict(self._stored.slurm_config)
         #self.slurm_ops_manager.render_config_and_restart(slurm_config)

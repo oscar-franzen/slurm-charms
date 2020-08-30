@@ -205,7 +205,7 @@ def get_inventory():
 
     node_info = f"NodeName={hostname} "\
                 f"NodeAddr={hostname} "\
-                f"State=UNKNOWN "\
+                f"State=CLOUD "\
                 f"{cpu_info} "\
                 f"RealMemory={mem}"
     if (gpus > 0):

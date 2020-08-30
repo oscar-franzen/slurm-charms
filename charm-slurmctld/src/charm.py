@@ -42,7 +42,6 @@ class SlurmctldCharm(CharmBase):
             slurmrestd_available=False,
 
         )
-        self.slurm_http_config = SlurmHttpConfigManager(self)
         self.elasticsearch = ElasticsearchRequires(self, "elasticsearch")
         self.slurm_ops_manager = SlurmOpsManager(self, "slurmctld")
         self.slurmdbd = SlurmdbdRequiresRelation(self, "slurmdbd")
@@ -88,8 +87,9 @@ class SlurmctldCharm(CharmBase):
             self.framework.observe(event, handler)
 
     def _on_install(self, event):
+        slurm_http_config = SlurmHttpConfigManager(self)
+        slurm_http_config.install_slurm_http_config_snap()
         self.slurm_ops_manager.install()
-        self.slurm_http_config.install_slurm_http_config_snap()
         self._stored.munge_key = self.slurm_ops_manager.get_munge_key()
         self._stored.slurm_installed = True
         self.unit.status = ActiveStatus("Slurm Installed")
