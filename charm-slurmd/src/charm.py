@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """SlurmdCharm."""
 import logging
+import random
 import subprocess
 from pathlib import Path
 from time import sleep
-import random
 
 
 import requests
@@ -62,6 +62,10 @@ class SlurmdCharm(CharmBase):
         self._stored.slurm_installed = True
 
     def _on_render_munge_key(self, event):
+        if not self._stored.slurm_installed:
+            event.defer()
+            return
+
         self.slurm_ops_manager._write_munge_key_and_restart(
             self._stored.munge_key
         )
@@ -83,13 +87,14 @@ class SlurmdCharm(CharmBase):
 
         sleep(random.randint(1, 5))
         # cast StoredState -> python dict
-        #slurm_config = dict(self._stored.slurm_config)
-        #self.slurm_ops_manager.render_config_and_restart(slurm_config)
+        # slurm_config = dict(self._stored.slurm_config)
+        # self.slurm_ops_manager.render_config_and_restart(slurm_config)
         Path("/var/snap/slurm/common/etc/slurm/slurm.conf").write_text(
             requests.get(f"http://{slurmctld_ingress_address}:9999").text
         )
-        subprocess.call(['systemctl', 'reload-or-restart', 'snap.slurm.slurmd'])
-            
+        subprocess.call(
+            ['systemctl', 'reload-or-restart', 'snap.slurm.slurmd'])
+
         self.unit.status = ActiveStatus("Slurmd Available")
 
     def is_slurm_installed(self):

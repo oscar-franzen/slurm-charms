@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """SlurmdProvides."""
-import json
+# import json
 import logging
 import os
 import re
@@ -28,8 +28,10 @@ class SlurmctldAvailableEvent(EventBase):
 class SlurmctldUnAvailableEvent(EventBase):
     """ConfigUnAvailableEvent."""
 
+
 class MungeKeyAvailableEvent(EventBase):
     """MungeKeyAvailableEvent."""
+
 
 class SlurmdProvidesEvents(ObjectEvents):
     """Slurm Provides Events."""
@@ -115,7 +117,7 @@ class SlurmdProvides(Object):
             event.defer()
             return
 
-        #self.charm.set_slurm_config(json.loads(slurm_config))
+        # self.charm.set_slurm_config(json.loads(slurm_config))
         self.charm.set_slurm_config_available(True)
         self.on.slurmctld_available.emit()
 

@@ -95,7 +95,7 @@ class SlurmdRequires(Object):
             self.on.slurmd_available.emit()
         else:
             self.charm.unit.status = BlockedStatus("Need > 0 units of slurmd")
-            #event.defer()
+            event.defer()
             return
 
     def _on_relation_departed(self, event):

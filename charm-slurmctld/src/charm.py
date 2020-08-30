@@ -18,7 +18,6 @@ from slurmdbd_requires import SlurmdbdRequiresRelation
 from slurmrestd_provides import SlurmrestdProvides
 
 
-
 logger = logging.getLogger()
 
 
@@ -96,7 +95,7 @@ class SlurmctldCharm(CharmBase):
 
     def _on_check_status_and_write_config(self, event):
         if not self._check_status():
-            #event.defer()
+            event.defer()
             return
         slurm_config = self._assemble_slurm_config()
         self.slurm_ops_manager.render_config_and_restart(slurm_config)
@@ -110,7 +109,7 @@ class SlurmctldCharm(CharmBase):
 
     def _on_provide_slurmrestd(self, event):
         if not self._check_status():
-            #event.defer()
+            event.defer()
             return
 
         slurm_config = self._assemble_slurm_config()

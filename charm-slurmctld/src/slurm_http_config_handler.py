@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+"""SlurmHttpConfigManager."""
 import logging
 import subprocess
 
@@ -10,6 +11,8 @@ logger = logging.getLogger()
 
 
 class SlurmHttpConfigManager:
+    """SlurmHttpConfigManager."""
+
     def __init__(self, charm):
         """Set self._relation_name and self.charm."""
         try:
@@ -20,7 +23,6 @@ class SlurmHttpConfigManager:
 
     def install_slurm_http_config_snap(self):
         """Install the slurm-http-config snap resource."""
-
         cmd = [
             "snap",
             "install",
