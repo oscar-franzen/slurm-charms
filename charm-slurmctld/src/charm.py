@@ -11,10 +11,12 @@ from ops.model import (
     ActiveStatus,
     BlockedStatus,
 )
+from slurm_http_config_handler import SlurmHttpConfigManager
 from slurm_ops_manager import SlurmOpsManager
 from slurmd_requires import SlurmdRequires
 from slurmdbd_requires import SlurmdbdRequiresRelation
 from slurmrestd_provides import SlurmrestdProvides
+
 
 
 logger = logging.getLogger()
@@ -40,6 +42,7 @@ class SlurmctldCharm(CharmBase):
             slurmrestd_available=False,
 
         )
+        self.slurm_http_config = SlurmHttpConfigManager(self)
         self.elasticsearch = ElasticsearchRequires(self, "elasticsearch")
         self.slurm_ops_manager = SlurmOpsManager(self, "slurmctld")
         self.slurmdbd = SlurmdbdRequiresRelation(self, "slurmdbd")
@@ -86,31 +89,28 @@ class SlurmctldCharm(CharmBase):
 
     def _on_install(self, event):
         self.slurm_ops_manager.install()
+        self.slurm_http_config.install_slurm_http_config_snap()
         self._stored.munge_key = self.slurm_ops_manager.get_munge_key()
         self._stored.slurm_installed = True
         self.unit.status = ActiveStatus("Slurm Installed")
 
     def _on_check_status_and_write_config(self, event):
         if not self._check_status():
-            event.defer()
+            #event.defer()
             return
         slurm_config = self._assemble_slurm_config()
-
-        self.slurmd.set_slurm_config_on_app_relation_data(
-            'slurmd',
-            slurm_config,
-        )
-        if self._stored.slurmrestd_available:
-            self.slurmd.set_slurm_config_on_app_relation_data(
-                'slurmrestd',
-                slurm_config,
-            )
         self.slurm_ops_manager.render_config_and_restart(slurm_config)
+
+        self.slurmd.set_slurm_config_on_app_relation_data('slurmd')
+
+        if self._stored.slurmrestd_available:
+            self.slurmd.set_slurm_config_on_app_relation_data('slurmrestd')
+
         self.unit.status = ActiveStatus("Slurmctld Available")
 
     def _on_provide_slurmrestd(self, event):
         if not self._check_status():
-            event.defer()
+            #event.defer()
             return
 
         slurm_config = self._assemble_slurm_config()

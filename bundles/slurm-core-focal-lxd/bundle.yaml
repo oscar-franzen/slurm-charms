@@ -11,6 +11,7 @@ applications:
     num_units: 1
     resources:
       slurm: ./../../slurm.resource
+      slurm-http-config: ./../../slurm-http-config.snap
   slurmd:
     charm: ./../../slurmd.charm
     series: focal

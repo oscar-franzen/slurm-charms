@@ -34,3 +34,7 @@ resources:
     type: file
     filename: slurm.resource
     description: slurm tarbal
+  slurm-http-config:
+    type: file
+    filename: slurm-http-config.snap
+    description: slurm-http-config snap

@@ -28,12 +28,15 @@ class SlurmctldAvailableEvent(EventBase):
 class SlurmctldUnAvailableEvent(EventBase):
     """ConfigUnAvailableEvent."""
 
+class MungeKeyAvailableEvent(EventBase):
+    """MungeKeyAvailableEvent."""
 
 class SlurmdProvidesEvents(ObjectEvents):
     """Slurm Provides Events."""
 
     slurmctld_available = EventSource(SlurmctldAvailableEvent)
     slurmctld_unavailable = EventSource(SlurmctldUnAvailableEvent)
+    munge_key_available = EventSource(MungeKeyAvailableEvent)
 
 
 class SlurmdProvides(Object):
@@ -63,6 +66,10 @@ class SlurmdProvides(Object):
             self._on_relation_created
         )
         self.framework.observe(
+            self.charm.on[self._relation_name].relation_joined,
+            self._on_relation_joined
+        )
+        self.framework.observe(
             self.charm.on[self._relation_name].relation_changed,
             self._on_relation_changed
         )
@@ -87,6 +94,14 @@ class SlurmdProvides(Object):
             event.defer()
             return
 
+    def _on_relation_joined(self, event):
+        self.charm.set_slurmctld_ingress_address(
+            event.relation.data[event.unit]['ingress-address']
+        )
+        munge_key = event.relation.data[event.app]['munge_key']
+        self.charm.set_munge_key(munge_key)
+        self.on.munge_key_available.emit()
+
     def _on_relation_changed(self, event):
         # Check that the app exists in the event
         if not event.relation.data.get(event.app):
@@ -100,7 +115,7 @@ class SlurmdProvides(Object):
             event.defer()
             return
 
-        self.charm.set_slurm_config(json.loads(slurm_config))
+        #self.charm.set_slurm_config(json.loads(slurm_config))
         self.charm.set_slurm_config_available(True)
         self.on.slurmctld_available.emit()
 

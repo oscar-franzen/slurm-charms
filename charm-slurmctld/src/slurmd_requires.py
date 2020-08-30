@@ -5,6 +5,7 @@ import json
 import logging
 import socket
 import subprocess
+import uuid
 
 
 from ops.framework import (
@@ -79,6 +80,13 @@ class SlurmdRequires(Object):
         unit_data = event.relation.data[self.model.unit]
         self._state.ingress_address = unit_data['ingress-address']
 
+        if not self.charm.is_slurm_installed():
+            event.defer()
+            return
+
+        app_data = event.relation.data[self.model.app]
+        app_data['munge_key'] = self.charm.get_munge_key()
+
     def _on_relation_changed(self, event):
         """Check for slurmdbd and slurmd, write config, set relation data."""
         if len(self.framework.model.relations['slurmd']) > 0:
@@ -87,7 +95,7 @@ class SlurmdRequires(Object):
             self.on.slurmd_available.emit()
         else:
             self.charm.unit.status = BlockedStatus("Need > 0 units of slurmd")
-            event.defer()
+            #event.defer()
             return
 
     def _on_relation_departed(self, event):
@@ -121,34 +129,35 @@ class SlurmdRequires(Object):
         relations = self.framework.model.relations['slurmd']
 
         slurmd_active_units = _get_slurmd_active_units()
-        self.charm.framework.breakpoint('ratty-rat-rat')
 
         for relation in relations:
             for unit in relation.units:
                 if unit.name in slurmd_active_units:
                     unit_data = relation.data[unit]
-                    ctxt = {
-                        'ingress_address': unit_data['ingress-address'],
-                        'hostname': unit_data['hostname'],
-                        'inventory': unit_data['inventory'],
-                        'partition_name': unit_data['partition_name'],
-                        'partition_default': unit_data['partition_default'],
-                    }
-                    # Related slurmd units don't specify custom
-                    # partition_config by default.
-                    # Only get partition_config if it exists on in the
-                    # related unit's unit data.
-                    if unit_data.get('partition_config'):
-                        ctxt['partition_config'] = \
-                                unit_data['partition_config']
-                    nodes_info.append(ctxt)
+                    if unit_data.get('ingress-address') and \
+                       unit_data.get('hostname') and \
+                       unit_data.get('inventory') and \
+                       unit_data.get('partition_name') and \
+                       unit_data.get('partition_default'):
+                        ctxt = {
+                            'ingress_address': unit_data['ingress-address'],
+                            'hostname': unit_data['hostname'],
+                            'inventory': unit_data['inventory'],
+                            'partition_name': unit_data['partition_name'],
+                            'partition_default':
+                            unit_data['partition_default'],
+                        }
+                        # Related slurmd units don't specify custom
+                        # partition_config by default.
+                        # Only get partition_config if it exists on in the
+                        # related unit's unit data.
+                        if unit_data.get('partition_config'):
+                            ctxt['partition_config'] = \
+                                    unit_data['partition_config']
+                        nodes_info.append(ctxt)
         return nodes_info
 
-    def set_slurm_config_on_app_relation_data(
-        self,
-        relation,
-        slurm_config,
-    ):
+    def set_slurm_config_on_app_relation_data(self, relation):
         """Set the slurm_conifg to the app data on the relation.
 
         Setting data on the relation forces the units of related applications
@@ -157,9 +166,7 @@ class SlurmdRequires(Object):
         """
         relations = self.charm.framework.model.relations[relation]
         for relation in relations:
-            relation.data[self.model.app]['slurm_config'] = json.dumps(
-                slurm_config
-            )
+            relation.data[self.model.app]['slurm_config'] = str(uuid.uuid4())
 
     def get_slurm_config(self):
         """Assemble and return the slurm_config."""
