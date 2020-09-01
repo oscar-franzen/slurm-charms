@@ -32,6 +32,7 @@ class SlurmdCharm(CharmBase):
             slurm_installed=False,
             slurm_config_available=False,
             slurm_config=dict(),
+            munge_key=None,
         )
 
         event_handler_bindings = {
@@ -54,11 +55,12 @@ class SlurmdCharm(CharmBase):
     def _on_render_config_and_restart(self, event):
         """Retrieve slurm_config from controller and write slurm.conf."""
         slurm_installed = self._stored.slurm_installed
+        munge_available = self._stored.munge_available
         slurm_config_available = self._stored.slurm_config_available
-
-        if (slurm_installed and slurm_config_available):
+        munge = { "munge_key": self._stored.munge_key}
+        if (slurm_installed and slurm_config_available and munge_available):
             # cast StoredState -> python dict
-            slurm_config = dict(self._stored.slurm_config)
+            slurm_config = {**dict(self._stored.slurm_config), munge}
             self.slurm_ops_manager.render_config_and_restart(slurm_config)
             self.unit.status = ActiveStatus("Slurmd Available")
         else:

@@ -1,10 +1,10 @@
 options:
   partition-default:
-    type: boolean
-    default: false
+    type: string
+    default: ""
     description: >-
-      'If this is True, jobs submitted without a partition specification
-      will utilize this partition.'
+      'The default partion for the node will be set to NO if left blank. If supplied with a value slurm.conf will be
+      render slurm.conf default_partion value with YES'
   partition-name:
     type: string
     default: partition1
