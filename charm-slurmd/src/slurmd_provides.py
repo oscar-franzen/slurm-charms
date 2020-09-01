@@ -92,7 +92,7 @@ class SlurmdProvides(Object):
     def _on_relation_changed(self, event):
         # Check that the app exists in the event
         munge = event.relation.data[event.unit].get("munge", None)
-        self.charm.stored.munge_key = munge_key
+        self.charm._stored.munge_key = munge_key
 
         if not event.relation.data.get(event.app):
             event.defer()

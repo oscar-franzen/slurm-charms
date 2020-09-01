@@ -60,7 +60,7 @@ class SlurmdCharm(CharmBase):
         munge = { "munge_key": self._stored.munge_key}
         if (slurm_installed and slurm_config_available and munge_available):
             # cast StoredState -> python dict
-            slurm_config = {**dict(self._stored.slurm_config), munge}
+            slurm_config = {**dict(self._stored.slurm_config), **munge}
             self.slurm_ops_manager.render_config_and_restart(slurm_config)
             self.unit.status = ActiveStatus("Slurmd Available")
         else:
