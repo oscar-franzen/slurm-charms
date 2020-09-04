@@ -1,11 +1,11 @@
 applications:
-  slurmrestd:
-    charm: ./../../slurmrestd.charm
-    constraints: spaces=nat root-disk=20G
-    series: focal
-    num_units: 1
-    resources:
-      slurm: ./../../slurm.resource
+#  slurmrestd:
+#    charm: ./../../slurmrestd.charm
+#    constraints: spaces=nat root-disk=20G
+#    series: focal
+#    num_units: 1
+#    resources:
+#      slurm: ./../../slurm.resource
   slurmctld:
     charm: ./../../slurmctld.charm
     constraints: spaces=nat root-disk=20G
@@ -13,6 +13,7 @@ applications:
     num_units: 1
     resources:
       slurm: ./../../slurm.resource
+      slurm-http-config: ./../../slurm-http-config.snap
   slurmd:
     charm: ./../../slurmd.charm
     constraints: spaces=nat root-disk=20G
@@ -34,8 +35,8 @@ applications:
     num_units: 1
 
 relations:
-  - - slurmctld:slurmrestd
-    - slurmrestd:slurmrestd
+#  - - slurmctld:slurmrestd
+#    - slurmrestd:slurmrestd
   - - slurmctld:slurmd
     - slurmd:slurmd
   - - slurmctld:slurmdbd
