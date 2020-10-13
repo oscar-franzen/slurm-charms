@@ -3,9 +3,9 @@ options:
     type: string
     default: cluster1
     description: >-
-      'Name to be recorded in database for jobs from this cluster.  This is
-      important if a single database is used to record information  from
-      multiple Slurm-managed clusters.'
+      'Name to be recorded in database for jobs from this cluster.
+      This is important if a single database is used to record
+      information from multiple Slurm-managed clusters.'
   custom_config:
     type: string
     default: ""
@@ -15,9 +15,9 @@ options:
     type: string
     default: proctrack/cgroup
     description: >-
-      'Identifies the plugin to be used for process tracking on a job step basis.
-      Can also be set to: proctrack/linuxproc (not recommended; might lead to
-      orphan processes).'
+      'Identifies the plugin to be used for process tracking on a job
+      step basis.  Can also be set to: proctrack/linuxproc (not
+      recommended; might lead to orphan processes).'
   node_weight_criteria:
     type: string
     default: none
@@ -35,3 +35,14 @@ options:
       ConstrainCores=yes
     description: >-
       'Configuration content for cgroup.conf'
+  log_level:
+    type: string
+    default: info
+    description: |
+      The level of detail to provide slurmd daemon's logs. The
+      default value is info. Valid choices are: quiet (log nothing),
+      fatal (log only fatal errors), info (log errors and general
+      information messages), verbose (log errors and verbose
+      informational messages). Then there are five debug levels which
+      will be increasingly noisy (errors + noise): debug, debug1,
+      debug2, debug3, debug4, debug5.

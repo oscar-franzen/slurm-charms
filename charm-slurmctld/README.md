@@ -9,6 +9,13 @@
 juju deploy slurmctld
 ```
 
+## Log level
+The level of detail to provide slurmd daemon''s logs. The default value is `info`. Valid choices are: `quiet` (log nothing), `fatal` (log only fatal errors), `info` (log errors and general information messages), `verbose` (log errors and verbose informational messages). Then there are five debug levels which will be increasingly noisy (errors + noise): `debug`, `debug1`, `debug2`, `debug3`, `debug4`, `debug5`.
+
+```bash
+juju config slurmctld log_level=debug
+```
+
 ## Process tracker
 The default process tracker is now using cgroup (seems to better prevent orphan processes).
 
