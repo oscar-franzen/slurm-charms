@@ -77,6 +77,8 @@ class SlurmdRequires(Object):
 
     def _on_relation_changed(self, event):
         """Check for slurmdbd and slurmd, write config, set relation data."""
+        logger.debug('_on_relation_changed(): entering')
+        
         if len(self.framework.model.relations['slurmd']) > 0:
             if not self._charm.is_slurmd_available():
                 self._charm.set_slurmd_available(True)

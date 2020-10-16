@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """Slurmdbd Operator Charm."""
 import logging
+import subprocess
 import socket
 
 
@@ -46,6 +47,7 @@ class SlurmdbdCharm(CharmBase):
             self._write_config_and_restart_slurmdbd,
             self._slurmdbd.on.slurmctld_unavailable:
             self._on_slurmctld_unavailable,
+            self.on.upgrade_charm: self._on_upgrade,
         }
         for event, handler in event_handler_bindings.items():
             self.framework.observe(event, handler)
@@ -57,7 +59,17 @@ class SlurmdbdCharm(CharmBase):
 
     def _on_upgrade(self, event):
         """Handle upgrade charm event."""
-        self._slurm_manager.upgrade()
+        logger.debug('_on_upgrade(): entering')
+        #self._slurm_manager.upgrade()
+        resource_path = str(self.model.resources.fetch('slurm'))
+        
+        subprocess.call([
+            "snap",
+            "install",
+            resource_path,
+            "--dangerous",
+            "--classic",
+        ])
 
     def _on_slurmctld_unavailable(self, event):
         self.unit.status = BlockedStatus("Need relation to slurmctld.")

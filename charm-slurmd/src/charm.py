@@ -55,7 +55,7 @@ class SlurmdCharm(CharmBase):
     def _on_upgrade(self, event):
         """Upgrade charm event handler."""
         slurm_config = dict(self._stored.slurm_config)
-        self.slurm_manager.upgrade(slurm_config)
+        self.slurm_manager.upgrade(slurm_config, resource=False)
 
     def _on_config_changed(self, event):
         self.slurmd.force_set_config_on_app_relation_data()
